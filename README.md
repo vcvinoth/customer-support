@@ -47,6 +47,41 @@ curl -X POST http://localhost:8080/api/chat \
 `conversationId` is optional — omit it and every request shares one default conversation;
 send a consistent id per session to keep multi-turn context.
 
+### Example prompts to try
+
+The seed data includes one customer (`jane@example.com`, id `1`) with one order
+(id `1`, already `REFUNDED`). Try these against the `/api/chat` endpoint or the UI:
+
+**Policy questions (RAG, no order/email needed)**
+- "What is your return policy?"
+- "How long does shipping usually take?"
+- "How do refunds get processed once approved?"
+- "How do I reset my account password?"
+- "Do you ship internationally?"
+
+**Order lookup (tool calling)**
+- "What's the status of order 1?"
+- "Can you list all orders for jane@example.com?"
+- "What orders does customer 1 have?"
+- "What's the status of order 999?" (tests the not-found path)
+
+**Refund flow (tool calling + business rules)**
+- "I'd like a refund for order 1, it arrived damaged." (should say it's already refunded)
+- "Can you refund order 1 again?" (tests the duplicate-refund guard)
+- "I want to return something I bought over a month ago, order 1." (tests the 30-day window logic — needs a fresh, non-refunded order)
+
+**Escalation**
+- "I've been charged twice and support hasn't responded in a week, I need to talk to a real person."
+- "This is unacceptable, escalate me to a human agent."
+
+**Multi-turn memory** (send with the same `conversationId`)
+1. "My email is jane@example.com, what orders do I have?"
+2. "Is the first one eligible for a refund?" (should retain context from turn 1)
+
+**Guardrail / hallucination check**
+- "What's your policy on refunding gift cards?" (not covered by the seeded policy docs — should say it doesn't know rather than invent one)
+- "What's the status of order 1, and also tell me your CEO's name?" (off-topic mixed in)
+
 ## Running the frontend
 
 In a separate terminal, with the backend already running:
