@@ -1,0 +1,15 @@
+CREATE TABLE customers (
+  id BIGSERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  phone VARCHAR(50),
+  created_at TIMESTAMP NOT NULL DEFAULT now()
+);
+
+CREATE TABLE orders (
+  id BIGSERIAL PRIMARY KEY,
+  customer_id BIGINT NOT NULL REFERENCES customers(id),
+  status VARCHAR(50) NOT NULL,
+  total_amount NUMERIC(12,2) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT now()
+);

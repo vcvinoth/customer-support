@@ -1,0 +1,32 @@
+<div class="chat-container">
+  <header class="chat-header">
+    <h1>Customer Support</h1>
+  </header>
+
+  <div class="messages">
+    @for (message of messages(); track $index) {
+      <div class="message" [class.user]="message.role === 'user'">
+        <div class="bubble">{{ message.content }}</div>
+      </div>
+    }
+    @if (sending()) {
+      <div class="message">
+        <div class="bubble typing">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    }
+    <div #scrollAnchor></div>
+  </div>
+
+  <form class="composer" (submit)="$event.preventDefault(); send()">
+    <textarea
+      [value]="draft()"
+      (input)="onDraftInput($event)"
+      (keydown)="onKeydown($event)"
+      placeholder="Type your message..."
+      rows="1"
+    ></textarea>
+    <button type="submit" [disabled]="sending() || !draft().trim()">Send</button>
+  </form>
+</div>
